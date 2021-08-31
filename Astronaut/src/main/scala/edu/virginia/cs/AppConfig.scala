@@ -34,7 +34,7 @@ object AppConfig {
   private final var testDB: String = params.getString("app.testDB")
   private final val postgresUser: String = params.getString("postgres.user")
   private final val postgresPassword: String = params.getString("postgres.password")
-  private final var icse2020SolutionFolder: String = params.getString("icse2020.solutionFolder")
+  private final var icse2022SolutionFolder: String = params.getString("icse2022.solutionFolder")
 
   def getPostgresUser(): String = {
     this.postgresUser
@@ -53,11 +53,11 @@ object AppConfig {
   }
   
   def getSolutionFolder(): String = {
-    this.icse2020SolutionFolder
+    this.icse2022SolutionFolder
   }
   
   def setSolutionFolder(folder: String) {
-    this.icse2020SolutionFolder = folder
+    this.icse2022SolutionFolder = folder
   }
 
   def setSpecList(list:List[String]) {
