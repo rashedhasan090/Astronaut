@@ -34,7 +34,7 @@ object AppConfig {
   private final var testDB: String = params.getString("app.testDB")
   private final val postgresUser: String = params.getString("postgres.user")
   private final val postgresPassword: String = params.getString("postgres.password")
-  private final var icse2022SolutionFolder: String = params.hasPath("icse2022.solutionFolder") ? params.getString("icse2022.solutionFolder") : ""
+  private final var icse2022SolutionFolder: String = if (params.hasPath("icse2022.solutionFolder")) params.getString("icse2022.solutionFolder") else ""
 
   def getPostgresUser(): String = {
     this.postgresUser
