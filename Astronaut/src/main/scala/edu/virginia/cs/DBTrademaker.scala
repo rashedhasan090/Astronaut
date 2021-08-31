@@ -2,7 +2,6 @@ package edu.virginia.cs
 
 import java.util.concurrent.TimeUnit
 
-
 import java.io.File
 import scala.collection.JavaConversions._
 import java.text.NumberFormat
@@ -14,7 +13,6 @@ import java.io.PrintWriter
 import java.util.Random
 import java.util.UUID
 import java.io.FileWriter
-
 
 import edu.virginia.cs.Framework._
 import edu.virginia.cs.Framework.Types.DBSpecification
@@ -83,6 +81,8 @@ class DBTrademaker extends AstronautFramework {
 
     val specs = AppConfig.getSpecs
     for (spec <- specs) {
+    
+      // synthesize the tradespace for the spec
       val mySpec: DBSpecification = new DBSpecification(spec)
       val evaluatedResults = tradespaceFunction(mySpec)
 
@@ -148,18 +148,14 @@ class DBTrademaker extends AstronautFramework {
     var impls = myIFunctionHelper(fImpl)
 
     if (AppConfig.getIsRandom == 0) {
-
       var fAbsMF: FormalAbstractMeasurementFunctionSet = myLFunction(fSpec)
-
       var fConMF: List[FormalConcreteMeasurementFunctionSet] = myTFunction(fAbsMF)(impls)
-
       var mfs = myBFunctionHelper(fConMF)
       var zipped = combine(impls)(mfs)
       return zipped
     } else if (AppConfig.getIsRandom == 1) {
       // get concrete measurement function by random generator
       var mfs = genRandomConcreteMF(impls)
-//      println("=======reverse begins=======")
       // Chong: copy self-defined list to Scala list while reversed
       var defaultValue = Nil[MeasurementFunctionSetType]()
       var head = hd[MeasurementFunctionSetType](defaultValue)(mfs)
@@ -171,8 +167,7 @@ class DBTrademaker extends AstronautFramework {
         head = hd[MeasurementFunctionSetType](defaultValue)(tail)
         tail = tl[MeasurementFunctionSetType](tail)
       }
-//      println("=======reverse finished=======")
-
+      
       // iterate to create list of pairs, call "combine" will result in StackOverFlowError
       var zipped = combine(impls)(reversedMfs)
       return zipped
@@ -584,11 +579,10 @@ class DBTrademaker extends AstronautFramework {
   // analyze and tradespace are already defined in Tradespace specification
   // we can call "tradespace" function to synthesize implementation and benchmark
   var myTradespace: Tradespace = new Build_Tradespace(mySynthesizer _, myRunBenchmark _, myMapReduce _)
+  
   // here we get the tradespace function and analyze function
   def tradespaceFunction = tradespace(myTradespace) // fun: (SpecificationType => List[Prod[ImplementationType, BenchmarkResultType]])
-  //var analyzeFunction = analyze(myTradespace)
-
-
+  
   /**
    * Use Spark to evaluate solutions
    * @param list
@@ -744,13 +738,18 @@ class DBTrademaker extends AstronautFramework {
     val mappingRun: String = FileOperation.getMappingRun(specPath)
     // call smartBridge
     new SmartBridge(solFolder, mappingRun, AppConfig.getMaxSolForImpl.intValue());
-    // delete mappingRun file
-    //new File(mappingRun).delete()
-
 
     // delete duplicate solutions
     DeleteUniq.del(solFolder)
+    
+    // log the time taken to synthesize all the results
+    var synthTime = System.currentTimeMillis() - startTime;
+    println(s"[ICSE2022] synthesis complete: time=$synthTime, spec=$specPath")
+    
+    getDatabaseImplsForFolder(fSpec, solFolder)
+  }
 
+  def getDatabaseImplsForFolder(fSpec: FormalSpecificationType, solFolder: String): List[FormalImplementationType] = {
     // scan solution folder, and get all the solutions
     var solFiles: Array[File] = new java.io.File(solFolder).listFiles.filter(_.getName.endsWith(".xml"))
     var imFile: File = null
