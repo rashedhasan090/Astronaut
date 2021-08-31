@@ -81,7 +81,7 @@ public class FileOperation {
     }
 
     public static String getRandomString(int length) {
-        String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabsdefghijklmnopqrstuvwxyz";
+        String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         StringBuilder b = new StringBuilder();
