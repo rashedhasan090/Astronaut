@@ -607,6 +607,7 @@ class DBTrademaker extends AstronautFramework {
       .set("spark.akka.timeout","600000")
       .set("spark.rpc.askTimeout", "600000")
       .set("spark.rpc.retry.wait","600000")
+      .set("spark.rpc.message.maxSize","300")
       .set("spark.storage.memoryFraction","0.9");
 
 //      .setMaster("spark://centurion002.cs.virginia.edu:7077")
