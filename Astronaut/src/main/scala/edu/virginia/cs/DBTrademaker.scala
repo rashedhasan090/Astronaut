@@ -710,41 +710,46 @@ class DBTrademaker extends AstronautFramework {
     if (isDebugOn) {
       println("This is myCFunction function")
     }
-    startTime = System.currentTimeMillis()
-    /*
-     * get specification file path
-     * calculate solution folder based on specification file path
-     * call smartbridge() function to synthesize formal implementations
-     * scan solution folder to get implementations
-     */
-    val specPath: String = fSpec.asInstanceOf[DBFormalSpecification].getSpec
-    var solFolder: String = specPath.substring(0, specPath.lastIndexOf(File.separator))
-    val alloyOMName = specPath.substring(specPath.lastIndexOf(File.separator) + 1, specPath.lastIndexOf("."))
-    solFolder = solFolder + File.separator + alloyOMName + File.separator + "ImplSolution"
-    recursiveDelete(new File(solFolder))
-    if (!new File(solFolder).exists()) {
-      val fileFP = new File(solFolder)
-      val rtn = fileFP.mkdirs()
-      if(rtn){
-        println("Solution folder created!:::"+solFolder);
-      } else {
-        if(isDebugOn){
-          println("Create solution folder failed!");
-        }
-      }
+    var solFolder: String = AppConfig.getSolutionFolder
+    if (solFolder == null || solFolder.trim.isEmpty) {
+	    startTime = System.currentTimeMillis()
+	    /*
+	     * get specification file path
+	     * calculate solution folder based on specification file path
+	     * call smartbridge() function to synthesize formal implementations
+	     * scan solution folder to get implementations
+	     */
+	    val specPath: String = fSpec.asInstanceOf[DBFormalSpecification].getSpec
+	    solFolder = specPath.substring(0, specPath.lastIndexOf(File.separator))
+	    val alloyOMName = specPath.substring(specPath.lastIndexOf(File.separator) + 1, specPath.lastIndexOf("."))
+	    solFolder = solFolder + File.separator + alloyOMName + File.separator + "ImplSolution"
+	    recursiveDelete(new File(solFolder))
+	    if (!new File(solFolder).exists()) {
+	      val fileFP = new File(solFolder)
+	      val rtn = fileFP.mkdirs()
+	      if(rtn){
+	        println("Solution folder created!:::"+solFolder);
+	      } else {
+	        if(isDebugOn){
+	          println("Create solution folder failed!");
+	        }
+	      }
+	    }
+	
+	    // get mapping run file
+	    val mappingRun: String = FileOperation.getMappingRun(specPath)
+	    // call smartBridge
+	    new SmartBridge(solFolder, mappingRun, AppConfig.getMaxSolForImpl.intValue());
+	
+	    // delete duplicate solutions
+	    DeleteUniq.del(solFolder)
+	    
+	    // log the time taken to synthesize all the results
+	    var synthTime = System.currentTimeMillis() - startTime;
+	    println(s"[ICSE2022] synthesis complete: time=$synthTime, spec=$specPath")
+    } else {
+    	println(s"[ICSE2020] reading results from folder: $solFolder")
     }
-
-    // get mapping run file
-    val mappingRun: String = FileOperation.getMappingRun(specPath)
-    // call smartBridge
-    new SmartBridge(solFolder, mappingRun, AppConfig.getMaxSolForImpl.intValue());
-
-    // delete duplicate solutions
-    DeleteUniq.del(solFolder)
-    
-    // log the time taken to synthesize all the results
-    var synthTime = System.currentTimeMillis() - startTime;
-    println(s"[ICSE2022] synthesis complete: time=$synthTime, spec=$specPath")
     
     getDatabaseImplsForFolder(fSpec, solFolder)
   }
