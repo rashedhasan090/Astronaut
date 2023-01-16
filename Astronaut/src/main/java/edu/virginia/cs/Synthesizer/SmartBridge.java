@@ -440,19 +440,17 @@ public class SmartBridge {
 			}
 			if (isParetoOptimal) {
 				paretoOptimalSolutions.add(solutionMV);
-				// file.println("Solution #" + solutionNo +
-				// " is a pareto Optimal Solution.");
-				// System.out.println("Solution #" + solutionNo +
-				// " is a pareto Optimal Solution.");
+				file.println("Solution #" + solutionNo + " is a pareto Optimal Solution.");
+				System.out.println("Solution #" + solutionNo + " is a pareto Optimal Solution.");
 				solutionsMV.add(solutionMV);
 				isNewSolution = true;
-				
+
 				// Chong: changed by Chong
 				// if storeAllSolution is on, then all solutions will be write
 				// there is no need to write again
 				if(!storeAllSolutions){
 					// changed to write all solutions before calling this method
-					solution.writeXML(trimmedFilename + "_Sol_" + solutionNo + ".xml"); 
+					solution.writeXML(trimmedFilename + "_Sol_" + solutionNo + ".xml");
 				}
 				// System.out.println("-----------------------------------------");
 				// file.println("Solution #" + solutionNo +
@@ -477,12 +475,11 @@ public class SmartBridge {
 						+ valueNFK);
 				file.println("Eq.Classes: " + solutionsMV.size() + " / "
 						+ solutionNo);
-				// file.println("# ParetoOptimalSolutions: "
-				// +paretoOptimalSolutions.size());
-				// file.println("-----------------------------------------\n");
-//				if (isDebugOn) {
-//					System.out.println("Current Time: " + now());
-//				}
+				file.println("# ParetoOptimalSolutions: "+paretoOptimalSolutions.size());
+				file.println("-----------------------------------------\n");
+    if (isDebugOn) {
+				System.out.println("Current Time: " + now());
+				}
 				file.println("-----------------------------------------");
 
 				// System.out.println(solutionMV.getTATI_detail());
